@@ -1,0 +1,162 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bocom.dao.ApplyAuditDao">
+    <resultMap type="com.bocom.domain.ApplyAudit" id="ApplyAudit">
+        
+         <result column="id" property="id" />
+         <result column="apply_userid" property="applyUserid" />
+         <result column="apply_type" property="applyType" />
+         <result column="apply_id" property="applyId" />
+         <result column="audit_user_id" property="auditUserId" />
+         <result column="audit_username" property="auditUsername" />
+         <result column="audit_status" property="auditStatus" />
+         <result column="audit_result" property="auditResult" />
+         <result column="apply_time" property="applyTime" />
+         <result column="audit_time" property="auditTime" />
+         <result column="remark" property="remark" />
+       
+    </resultMap>
+    
+    <resultMap type="com.bocom.dto.ApplyAuditDto" id="ApplyAuditDto">
+        
+         <result column="id" property="id" />
+         <result column="apply_userid" property="applyUserid" />
+         <result column="apply_type" property="applyType" />
+         <result column="apply_id" property="applyId" />
+         <result column="audit_user_id" property="auditUserId" />
+         <result column="audit_username" property="auditUsername" />
+         <result column="audit_status" property="auditStatus" />
+         <result column="audit_result" property="auditResult" />
+         <result column="apply_time" property="applyTime" />
+         <result column="audit_time" property="auditTime" />
+         <result column="remark" property="remark" />
+         <result column="apply_reason" property="applyReason" />
+         <result column="apply_sapce" property="applySapce" />
+         <result column="apply_space_type" property="applySpaceType" />
+         <result column="apply_target_id" property="applyTargetId" />
+         <result column="apply_target_name" property="applyTargetName" />
+       
+    </resultMap>
+    
+    <select id="selectAll" resultMap="ApplyAudit" parameterType="com.bocom.domain.ApplyAudit">
+        SELECT 
+       	  	 id,
+       	  	 apply_userid,
+       	  	 apply_type,
+       	  	 apply_id,
+       	  	 audit_user_id,
+       	  	 audit_username,
+       	  	 audit_status,audit_result,
+       	  	 apply_time,
+       	  	 audit_time,
+       	  	 remark
+        FROM t_apply_audit
+    </select>
+    
+     <insert id="insert" parameterType="com.bocom.domain.ApplyAudit">
+        INSERT INTO t_apply_audit
+        (
+       	  	 apply_userid,
+       	  	 apply_type,
+       	  	 apply_id,
+       	  	 audit_user_id,
+       	  	 audit_username,
+       	  	 audit_status,audit_result,
+       	  	 apply_time,
+       	  	 audit_time,
+       	  	 remark
+        )
+        VALUES
+        (
+      	  	#{applyUserid},
+      	  	#{applyType},
+      	  	#{applyId},
+      	  	#{auditUserId},
+      	  	#{auditUsername},
+      	  	#{auditStatus},#{auditResult},
+      	  	#{applyTime},
+      	  	#{auditTime},
+			#{remark}        )
+    </insert>
+    <!-- 获取相应的申请列表 -->
+    <select id="selectApplyAuditList" resultMap="ApplyAudit" parameterType="com.bocom.domain.ApplyAudit">
+        SELECT 
+       	  	 id,
+       	  	 apply_userid,
+       	  	 apply_type,
+       	  	 apply_id,
+       	  	 audit_user_id,
+       	  	 audit_username,
+       	  	 audit_status,audit_result,
+       	  	 apply_time,
+       	  	 audit_time,
+       	  	 remark
+        FROM t_apply_audit WHERE 1=1 
+        <if test="auditStatus!=null and auditStatus!='' ">
+				and audit_status = #{auditStatus},
+			</if>
+    </select>
+    <!-- 获取相应的申请详情 -->
+    <select id="selectApplyAuditInfo" resultMap="ApplyAuditDto" parameterType="com.bocom.domain.ApplyAudit">
+        SELECT 
+       	  	 taa.id,
+       	  	 taa.apply_userid,
+       	  	 taa.apply_type,
+       	  	 taa.apply_id,
+       	  	 taa.audit_user_id,
+       	  	 taa.audit_username,
+       	  	 taa.audit_status,taa.audit_result,
+       	  	 taa.audit_time,
+       	  	 taa.remark,tas.apply_reason,tas.apply_sapce,tas.apply_time,tas.apply_space_type,tas.apply_target_id,tas.apply_target_name
+        FROM t_apply_audit taa,t_apply_space tas
+ 		WHERE 1=1  and taa.apply_type=0 and taa.apply_id=tas.id
+ 			<if test="auditStatus!=null and auditStatus!='' ">
+				and audit_status = #{auditStatus},
+			</if>
+			<if test="id!=null ">
+				and id = #{id},
+			</if>
+			<if test="applyId!=null ">
+				and apply_id = #{applyId},
+			</if>
+    </select>
+    <!-- 更新审核表 -->
+    <update id="updateApplyAuditInfo" parameterType="com.bocom.domain.ApplyAudit">
+		UPDATE t_apply_audit
+		<set>
+			<if test="apply_userid!=null">
+				apply_userid = #{applyUserid},
+			</if>
+			<if test="applyType!=null and applyType!='' ">
+				apply_type = #{applyType},
+			</if>
+			<if test="applyId!=null">
+				apply_id = #{applyId},
+			</if>
+			<if test="auditUserId!=null">
+				audit_user_id = #{auditUserId},
+			</if>
+			<if test="auditUsername!=null and auditUsername!='' ">
+				audit_username = #{auditUsername},
+			</if>
+			<if test="auditStatus!=null and auditStatus!='' ">
+				audit_status = #{auditStatus},
+			</if>
+			<if test="auditResult!=null and auditResult!='' ">
+				audit_result = #{auditResult},
+			</if>
+			<if test="applyTime!=null ">
+				apply_time = #{applyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="auditTime!=null ">
+				audit_time = #{auditTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remark!=null and remark!='' ">
+				remark = #{remark},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+</mapper>

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="cd-web:war">
+    <output-path>$PROJECT_DIR$/cd-web/target</output-path>
+    <root id="archive" name="CD.war">
+      <element id="artifact" artifact-name="cd-web:war exploded" />
+    </root>
+  </artifact>
+</component>

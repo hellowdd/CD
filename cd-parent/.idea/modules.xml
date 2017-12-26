@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/cd-business/cd-business.iml" filepath="$PROJECT_DIR$/cd-business/cd-business.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cd-parent.iml" filepath="$PROJECT_DIR$/cd-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cd-service/cd-service.iml" filepath="$PROJECT_DIR$/cd-service/cd-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cd-util/cd-util.iml" filepath="$PROJECT_DIR$/cd-util/cd-util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cd-web/cd-web.iml" filepath="$PROJECT_DIR$/cd-web/cd-web.iml" />
+    </modules>
+  </component>
+</project>

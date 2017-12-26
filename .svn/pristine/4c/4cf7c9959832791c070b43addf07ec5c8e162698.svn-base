@@ -1,0 +1,367 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bocom.dao.WidgetInfoDao">
+    <resultMap type="com.bocom.domain.WidgetInfo" id="widgetInfoVO">
+        
+         <result column="id" property="id" />
+         <result column="widget_name" property="widgetName" />
+         <result column="widget_name_show" property="widgetNameShow" />
+         <result column="storage_path" property="storagePath" />
+         <result column="widget_size" property="widgetSize" />
+         <result column="widget_version" property="widgetVersion" />
+         <result column="widget_from" property="widgetFrom" />
+         <result column="widget_extension" property="widgetExtension" />
+         <result column="upload_time" property="uploadTime" />
+         <result column="upload_userid" property="uploadUserid" />
+         <result column="upload_username" property="uploadUsername" />
+         <result column="update_userid" property="updateUserid" />
+         <result column="update_username" property="updateUsername" />
+         <result column="update_time" property="updateTime" />
+         <result column="MD5" property="md5" />
+         <result column="download_times" property="downloadTimes" />
+         <result column="remarks" property="remarks" />
+         <result column="share_range" property="shareRange" />
+         <result column="is_delete" property="isDelete" />
+         <result column="is_delete_physically" property="isDeletePhysically" />
+       
+    </resultMap>
+    
+    <select id="selectAll" resultMap="widgetInfoVO" parameterType="com.bocom.domain.WidgetInfo">
+        SELECT 
+       	  	 id,
+       	  	 widget_name,
+       	  	 widget_name_show,
+       	  	 storage_path,
+       	  	 widget_size,
+       	  	 widget_version,
+       	  	 widget_from,
+       	  	 widget_extension,
+       	  	 upload_time,
+       	  	 upload_userid,
+       	  	 upload_username,
+       	  	 update_userid,
+       	  	 update_username,
+       	  	 update_time,
+       	  	 MD5,
+       	  	 download_times,
+       	  	 remarks,
+       	  	 share_range,
+       	  	 is_delete,
+       	  	 is_delete_physically
+        FROM t_widget_info
+    </select>
+    <select id="queryWidgetInfoList" parameterType="Map" resultType="java.util.HashMap">
+		SELECT 
+       	  	  wi. id,
+       	  	  wi.widget_name,
+       	  	 wi.widget_name_show,
+       	  	 wi.storage_path,
+       	  	 wi.widget_size,
+       	  	 wi.widget_version,
+       	  	 wi.widget_from,
+       	  	 wi.widget_extension,
+       	  	 wi.upload_time,
+       	  	 wi.upload_userid,
+       	  	 wi.upload_username,
+       	  	 wi.update_userid,
+       	  	 wi.update_username,
+       	  	 wi.update_time,
+       	  	 wi.MD5,
+       	  	 wei.download_times,
+       	  	 wi.remarks,wei.is_share,
+       	  	 wei.share_range,
+       	  	 wi.is_delete,
+       	  	 wi.is_delete_physically,dw.director_name,wei.widget_type_id,twt.widget_type_name,wei.directory_id,wei.app_type
+       	  	FROM t_widget_info wi ,t_widget_extend_info wei,t_directory_widget dw ,t_widget_type twt
+       	  	where 1=1 and wi.id=wei.widget_id and wei.directory_id=dw.id and wi.is_delete='0' and wi.is_delete_physically='0' and wei.widget_type_id=twt.id 
+		<if test="uploadUserid!=null">
+			and wi.upload_userid=#{uploadUserid}
+		</if>
+		<if test="directoryId!=null ">
+			and dw.id=#{directoryId}
+		</if>
+		<if test="widgetName!=null and widgetName!=''">
+        	 and instr(wi.widget_name,#{widgetName})>0
+		</if>
+		<if test="beginTime!=null and beginTime!=''">
+	    	<![CDATA[  and  wi.upload_time >=#{beginTime}  ]]>
+		</if>
+		<if test="endTime!=null and endTime!=''">
+			<![CDATA[and   wi.upload_time<=#{endTime} ]]>
+		</if>
+		<if test="isShare!=null and isShare!=''">
+			and wei.is_share=#{isShare}
+		</if>
+		<if test="widgetTypeId !=null">
+			and wei.widget_type_id=#{widgetTypeId}
+		</if>
+		<if test="appType !=null">
+			and wei.app_type=#{appType}
+		</if>
+		<if test="shareRange != null and shareRange != ''">
+				and wi.id in (SELECT DISTINCT t.id from t_widget_info t ,t_apply_share tas where t.id not in (SELECT tt.widget_id from t_apply_share tt  where tt.widget_id is not null) 
+or (tas.widget_id=t.id and tas.share_range=#{shareRange}))
+		</if>
+		<if test="pageStart!=null">
+			 ORDER BY upload_time DESC limit #{pageStart},#{pageSize}
+		</if>
+	</select>
+	<select id="queryWidgetInfoListCount" parameterType="Map" resultType="java.lang.Integer">
+		SELECT 
+       	  	  count(*)
+       	  	FROM t_widget_info wi ,t_widget_extend_info wei,t_directory_widget dw ,t_widget_type twt 
+       	  	where 1=1 and wi.id=wei.widget_id and wei.directory_id=dw.id and wi.is_delete='0' and wi.is_delete_physically='0' and wei.widget_type_id=twt.id
+		<if test="uploadUserid!=null">
+			and wi.upload_userid=#{uploadUserid}
+		</if>
+		<if test="directoryId!=null ">
+			and dw.id=#{directoryId}
+		</if>
+		<if test="widgetName!=null and widgetName!=''">
+        	 and instr(wi.widget_name,#{widgetName})>0
+		</if>
+		<if test="beginTime!=null and beginTime!=''">
+	    	<![CDATA[  and  wi.upload_time >=#{beginTime}  ]]>
+		</if>
+		<if test="endTime!=null and endTime!=''">
+			<![CDATA[and   wi.upload_time<=#{endTime} ]]>
+		</if>
+		<if test="isShare!=null and isShare!=''">
+			and wei.is_share=#{isShare}
+		</if>
+		<if test="widgetTypeId !=null">
+			and wei.widget_type_id=#{widgetTypeId}
+		</if>
+		<if test="appType !=null">
+			and wei.app_type=#{appType}
+		</if>
+		<if test="shareRange != null and shareRange != ''">
+				and wi.id in (SELECT DISTINCT t.id from t_widget_info t ,t_apply_share tas where t.id not in (SELECT tt.widget_id from t_apply_share tt  where tt.widget_id is not null) 
+or (tas.widget_id=t.id and tas.share_range=#{shareRange}))
+		</if>
+	</select>
+	
+     <insert id="insert" useGeneratedKeys="true" keyProperty="id"  parameterType="com.bocom.domain.WidgetInfo">
+        INSERT INTO t_widget_info
+        (
+       	  	 widget_name,
+       	  	 widget_name_show,
+       	  	 storage_path,
+       	  	 widget_size,
+       	  	 widget_version,
+       	  	 widget_from,
+       	  	 widget_extension,
+       	  	 upload_time,
+       	  	 upload_userid,
+       	  	 upload_username,
+       	  	 update_userid,
+       	  	 update_username,
+       	  	 update_time,
+       	  	 MD5,
+       	  	 remarks,
+       	  	 share_range
+        )
+        VALUES
+        (
+      	  	#{widgetName},
+      	  	#{widgetNameShow},
+      	  	#{storagePath},
+      	  	#{widgetSize},
+      	  	#{widgetVersion},
+      	  	#{widgetFrom},
+      	  	#{widgetExtension},
+      	  	#{uploadTime},
+      	  	#{uploadUserid},
+      	  	#{uploadUsername},
+      	  	#{updateUserid},
+      	  	#{updateUsername},
+      	  	#{updateTime},
+      	  	#{md5},
+      	  	#{remarks},
+      	  	#{shareRange}        )
+    </insert>
+
+
+	<insert id="insertWidget" useGeneratedKeys="true" keyProperty="id"  parameterType="com.bocom.domain.WidgetInfo">
+		INSERT INTO t_widget_info
+		(
+		widget_name,
+		storage_path,
+		widget_size,
+		widget_extension,
+		upload_userid,
+		upload_username,
+		MD5,
+		remarks
+		)
+		VALUES
+		(
+		#{widgetName},
+		#{storagePath},
+		#{widgetSize},
+		#{widgetExtension},
+		#{uploadUserid},
+		#{uploadUsername},
+		#{md5},#{remarks}      )
+	</insert>
+
+
+	<update id="updateWidgetInfo" parameterType="com.bocom.domain.WidgetInfo">
+		update t_widget_info
+		<set>
+			<if test="widgetName != null and widgetName !=''">
+				widget_name = #{widgetName},
+			</if>
+			<if test="widgetNameShow != null and widgetNameShow !=''">
+				widget_name_show = #{widgetNameShow},
+			</if>
+			<if test="storagePath != null and storagePath !=''">
+				storage_path = #{storagePath},
+			</if>
+			<if test="widgetSize != null">
+				widget_size = #{widgetSize},
+			</if>
+			<if test="widgetVersion != null and widgetVersion !=''">
+				widget_version = #{widgetVersion},
+			</if>
+			<if test="widgetExtension != null and widgetExtension !=''">
+				widget_extension = #{widgetExtension},
+			</if>
+			<if test="updateUserid != null">
+				update_userid = #{updateUserid},
+			</if>
+			<if test="updateUsername != null and updateUsername !=''">
+				update_username = #{updateUsername},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime},
+			</if>
+			<if test="remarks != null">
+				remarks = #{remarks},
+			</if>
+			<if test="isDelete != null">
+				is_delete = #{isDelete},
+			</if>
+			<if test="isDeletePhysically != null">
+				is_delete_physically = #{isDeletePhysically},
+			</if>
+			
+		</set>
+		where 1=1 and id=#{id}
+	</update>
+	<!-- 按条件查询控件信息  -->
+	<select id="selectWidgetInfo" resultMap="widgetInfoVO" parameterType="com.bocom.domain.WidgetInfo">
+        SELECT 
+       	  	 id,
+       	  	 widget_name,
+       	  	 widget_name_show,
+       	  	 storage_path,
+       	  	 widget_size,
+       	  	 widget_version,
+       	  	 widget_from,
+       	  	 widget_extension,
+       	  	 upload_time,
+       	  	 upload_userid,
+       	  	 upload_username,
+       	  	 update_userid,
+       	  	 update_username,
+       	  	 update_time,
+       	  	 MD5,
+       	  	 download_times,
+       	  	 remarks,
+       	  	 share_range,
+       	  	 is_delete,
+       	  	 is_delete_physically
+        FROM t_widget_info
+        where 1=1 and is_delete='0' and is_delete_physically='0'
+        <if test="id!=null">
+			and id=#{id}
+		</if>
+		<if test="widgetName!=null and widgetName!=''">
+			and widget_name=#{widgetName}
+		</if>
+		<if test="widgetVersion!=null and widgetVersion!=''">
+			and widget_version=#{widgetVersion}
+		</if>
+		<if test="uploadUserid!=null">
+			and upload_userid=#{uploadUserid}
+		</if>
+    </select>
+    <!-- 企业上传控件统计排名 -->
+    <select id="queryWidgetNum" parameterType="Map" resultType="java.util.HashMap">
+    	SELECT  upload_userid, upload_username,COUNT(id) as count
+    	FROM t_widget_info 
+    	where is_delete='0' and is_delete_physically='0' GROUP BY upload_username ORDER BY COUNT(id) DESC
+    	<if test="pageStart!=null">
+			limit #{pageStart},#{pageSize}
+		</if>
+	</select>
+	<!-- 企业控件总发布次数统计排名 -->
+    <select id="queryWidgetAllReleaseNum" parameterType="Map" resultType="java.util.HashMap">
+    	SELECT wi.upload_username,SUM(wei.release_times) as release_times 
+    	FROM t_widget_info wi,t_widget_extend_info wei 
+		where 1=1 and wei.widget_id=wi.id and wi.is_delete='0' and wi.is_delete_physically='0' 
+		GROUP BY wi.upload_username ORDER BY SUM(wei.release_times) DESC
+		<if test="pageStart!=null">
+			limit #{pageStart},#{pageSize}
+		</if>
+	</select>
+	<!-- 企业每个控件发布下载次数统计排名 -->
+    <select id="queryWidgetReleaseNum" parameterType="Map" resultType="java.util.HashMap">
+    	SELECT wi.upload_username,wei.release_times,wei.download_times,wi.widget_name_show FROM t_widget_info wi,t_widget_extend_info wei 
+		where 1=1 and wei.widget_id=wi.id and wi.is_delete='0' and wi.is_delete_physically='0' 
+		<if test="uploadUserid!=null">
+			and upload_userid=#{uploadUserid}
+		</if>
+		 ORDER BY wei.release_times DESC
+		<if test="pageStart!=null">
+			limit #{pageStart},#{pageSize}
+		</if>
+	</select>
+	<!-- 企业每个控件发布下载次数统计排名 统计总数 -->
+    <select id="queryWidgetReleaseNumCount" parameterType="Map" resultType="java.lang.Integer">
+    	SELECT count(wi.id) FROM t_widget_info wi,t_widget_extend_info wei 
+		where 1=1 and wei.widget_id=wi.id and wi.is_delete='0' and wi.is_delete_physically='0' 
+		<if test="uploadUserid!=null">
+			and upload_userid=#{uploadUserid}
+		</if>
+		 ORDER BY wei.release_times DESC
+	</select>
+	<!-- 按类型统计 控件量 -->
+	<select id="queryWidgetNumByType" parameterType="Map" resultType="java.util.HashMap">
+    	select a.id,a.widget_type_name,IFNULL(b.count,0) as count from t_widget_type a LEFT JOIN (SELECT wt.widget_type_name,wt.id,count(wi.id) as count
+    	from t_widget_info wi,t_widget_extend_info wei,t_widget_type wt  
+		where 1=1 and wi.id=wei.widget_id and wei.widget_type_id = wt.id  and wi.is_delete='0' and wi.is_delete_physically='0' GROUP BY wei.widget_type_id)b ON a.id=b.id
+	</select>
+
+	<!--查询总的文件数目-->
+	<select id="queryCountWidget"  resultType="java.lang.Integer">
+		select count(*) from t_widget_info where is_delete=0
+	</select>
+
+	<!--查询总的文件大小，返回已兆为单位-->
+	<select id="queryWidgetSize"  resultType="java.lang.Integer">
+		select sum(widget_size)/1024/1024 from t_widget_info where is_delete=0
+	</select>
+
+	<!--查询各个文件类型的总量，各个类型的文件占用空间大小-->
+	<select id="queryWidgetType"  resultType="java.util.HashMap">
+		select count(*),SUM(widget_size)/1024/1024,widget_extension from t_widget_info GROUP BY widget_extension;
+	</select>
+
+
+	<!--查询文件是否已经存在，通过MD5来进行比较-->
+	<select id="queryMD5" parameterType="Map"  resultType="java.util.HashMap">
+		select *  from t_widget_info where 1=1 and is_delete=0
+		<if test="MD5!=null">
+			and MD5=#{MD5}
+		</if>
+		<if test="uploadUserid!=null">
+			and upload_userid=#{uploadUserid}
+		</if>
+
+	</select>
+
+</mapper>

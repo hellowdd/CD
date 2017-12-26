@@ -1,0 +1,119 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bocom.dao.WidgetTypeDao">
+    <resultMap type="com.bocom.domain.WidgetType" id="WidgetType">
+        
+         <result column="id" property="id" />
+         <result column="widget_type_name" property="widgetTypeName" />
+         <result column="widget_type_content" property="widgetTypeContent" />
+         <result column="create_time" property="createTime" />
+         <result column="create_userid" property="createUserid" />
+         <result column="create_username" property="createUsername" />
+         <result column="update_time" property="updateTime" />
+         <result column="is_all" property="isAll" />
+       
+    </resultMap>
+    
+    <select id="selectAll" resultMap="WidgetType" parameterType="com.bocom.domain.WidgetType">
+        SELECT 
+       	  	 id,
+       	  	 widget_type_name,
+       	  	 widget_type_content,
+       	  	 create_time,
+       	  	 create_userid,
+       	  	 create_username,
+       	  	 update_time,
+       	  	 is_all
+        FROM t_widget_type
+    </select>
+    
+     <insert id="insert"  useGeneratedKeys="true" keyProperty="id"   parameterType="com.bocom.domain.WidgetType">
+        INSERT INTO t_widget_type
+        (
+       	  	 widget_type_name,
+       	  	 widget_type_content,
+       	  	 create_time,
+       	  	 create_userid,
+       	  	 create_username,
+       	  	 update_time,
+       	  	 is_all
+        )
+        VALUES
+        (
+      	  	#{widgetTypeName},
+      	  	#{widgetTypeContent},
+      	  	#{createTime},
+      	  	#{createUserid},
+      	  	#{createUsername},
+      	  	#{updateTime},
+			#{isAll}        )
+    </insert>
+    
+    <!-- 查找该类型 -->
+	<select id="selectWidgetTypeInfoById" resultMap="WidgetType"
+		parameterType="com.bocom.domain.WidgetType">
+		SELECT
+			id,
+       	  	 widget_type_name,
+       	  	 widget_type_content,
+       	  	 create_time,
+       	  	 create_userid,
+       	  	 create_username,
+       	  	 update_time,
+       	  	 is_all FROM t_widget_type
+		where 1=1
+		<if test="id!=null ">
+			and id=#{id}
+		</if>
+		<if test="widgetTypeName!=null ">
+			and widget_type_name=#{widgetTypeName}
+		</if>
+		<if test="createUserid != null ">
+			and create_userid=#{createUserid}
+		</if>
+	</select>
+	<!-- 查找某用户下的类型 -->
+	<select id="selectWidgetTypeInfoByUser" resultMap="WidgetType"
+		parameterType="com.bocom.domain.WidgetType">
+		SELECT
+		id,
+       	  	 widget_type_name,
+       	  	 widget_type_content,
+       	  	 create_time,
+       	  	 create_userid,
+       	  	 create_username,
+       	  	 update_time,
+       	  	 is_all
+		FROM
+		t_widget_type
+		where 1=1 
+		<if test="createUserid != null ">
+			and create_userid=#{createUserid}
+		</if>
+		<if test="isAll != null and isAll!=''">
+			and is_all=#{isAll}
+		</if>
+	</select>
+
+	<!-- 修改类型 -->
+	<update id="updateWidgetType" parameterType="com.bocom.domain.WidgetType">
+		UPDATE t_widget_type
+		<set>
+			<if test="widgetTypeName !=null and widgetTypeName !='' ">
+				widget_type_name = #{widgetTypeName},
+			</if>
+			<if test="widgetTypeContent !=null"> 
+				widget_type_content = #{widgetTypeContent},
+			 </if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<delete id="deleteWidgetType" parameterType="com.bocom.domain.WidgetType">
+		delete from
+		t_widget_type where id=#{id}
+	</delete>
+	
+</mapper>

@@ -1,0 +1,94 @@
+body{
+	overflow: hidden;
+}
+.header{
+	position: absolute;
+	left:0;
+	right:0;
+	top:0;
+	height: 80px;
+	background-color: #069;
+}
+	.logo{
+		position: absolute;
+		left:15px;
+		top:15px;
+		width:297px;
+		height: 48px;
+		background: url(../img/logo_kjkgl.png) center center no-repeat;
+	}
+	.user-info{
+		float: right;
+		height: 80px;
+	}
+	.user-avatar{
+		float:right;
+		margin: 10px 12px;
+		width:60px;
+		height: 60px;
+		background: url(../img/avatar-default.png) center center no-repeat #fff;
+	}
+	.user-txt{
+		float: right;
+		margin: 15px 20px 0 0;
+		line-height: 24px;
+	}
+.sidebar{
+	position: absolute;
+	left:0;
+	top:80px;
+	bottom: 0;
+	width:250px;
+}
+.main{
+	position: absolute;
+	left: 251px;
+	top: 80px;
+	right:0;
+	bottom:0;
+}
+.main>iframe{
+	width:100%;
+	height: 100%;
+}
+
+/*---- main-nav ----*/
+.main-nav {
+	padding: 10px 0;
+	border-bottom: 1px solid #ccc;
+	background:url(../img/sidebar-border.png) right top repeat-y #eee;
+}
+.main-nav>ul{
+	margin:0;
+	padding:0;
+}
+.main-nav>ul>li{
+	list-style:none;
+}
+.main-nav>ul>li>a{
+	display: block;
+	width: 250px;
+	padding: 10px 0 10px 20px;
+	text-decoration: none;
+	color: #333;
+	background-color:#b2c3dc;
+	border-top: 1px solid #eee;
+}
+.main-nav>ul>.active>a{
+	color: #fff;
+	background-color:#069;
+}
+
+.txt-white{
+	color: #fff !important;
+}
+/*---- cover ----*/
+.cover{
+	display: none;
+	position: absolute;
+	z-index: 990;
+	left:0;
+	top:0;
+	right:0;
+	bottom:0;
+}

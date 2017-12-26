@@ -1,0 +1,39 @@
+#application id
+project.appid=WRM
+project.app.version=0.0.1
+
+c3p0.driverClass=com.mysql.jdbc.Driver
+c3p0.user=bocom
+c3p0.password=bocommysql
+c3p0.jdbcUrl=jdbc\:mysql\://rm-go6v05xbdhe58uf9t.mysql.rds.aliyuncs.com\:3306/bocom_wrm?useUnicode\=true&characterEncoding\=utf-8
+c3p0.minPoolSize = 1
+c3p0.maxPoolSize = 50
+c3p0.initialPoolSize = 1
+c3p0.maxIdleTime = 25000
+c3p0.acquireIncrement = 1
+c3p0.acquireRetryAttempts = 30
+c3p0.acquireRetryDelay = 1000
+c3p0.testConnectionOnCheckin = true
+c3p0.automaticTestTable = t_c3p0
+c3p0.idleConnectionTestPeriod = 18000
+c3p0.checkoutTimeout=5000
+
+#cas settings
+cas.casServerLoginUrl=http://202.98.194.30/CAS/login
+cas.casServerUrlPrefix=http://172.16.20.58:9999/CAS
+cas.serverName=http://202.98.194.30
+cas.authenticationFilter.urlPattern=/manager/*
+cas.cas20ProxyRTVFilter.urlPattern=/manager/*
+role.permission=[{"roleCode":"2","permission":"/loginCas,/manager/"},{"roleCode":"1","permission":"/loginCas,/manager/"}]
+
+#rest
+##--pap\u63A5\u53E3
+rest.user.getUserInfoFromPAP.url=http://172.16.20.58:8999/PAP/a/sys/manager/roleAction/queryAppRoles
+rest.user.getUserListByOrgId.url=http://172.16.20.58:8999/PAP/a/site/org/queryStuffsByOrgCode/
+rest.pap.addRoles.url=http://172.16.20.58:8999/PAP/a/sys/manager/roleAction/init
+rest.pap.addMsg.url=http://172.16.20.58:8999/PAP/a/sys/msg/init
+
+enncloud.file.url.prefix=http://10.19.248.200:30180/api/v1/files
+enncloud.app.url.prefix=http://10.19.248.200:30180/api/v1/apps
+fastDFS.http.url=http://202.98.194.30/FASTDFS
+

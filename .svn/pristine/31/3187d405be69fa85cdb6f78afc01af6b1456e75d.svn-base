@@ -1,0 +1,114 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bocom.dao.DirectoryWidgetDao">
+	<resultMap type="com.bocom.domain.DirectoryWidget" id="DirectoryWidget">
+
+		<result column="id" property="id" />
+		<result column="director_name" property="directorName" />
+		<result column="parent_directory_id" property="parentDirectoryId" />
+		<result column="userId" property="userId" />
+		<result column="userName" property="userName" />
+
+	</resultMap>
+
+	<select id="selectAll" resultMap="DirectoryWidget"
+		parameterType="com.bocom.domain.DirectoryWidget">
+		SELECT
+		id,
+		director_name,
+		parent_directory_id,
+		userId,
+		userName
+		FROM t_directory_widget
+	</select>
+	<!-- 创建目录 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id"  parameterType="com.bocom.domain.DirectoryWidget">
+		INSERT INTO t_directory_widget
+		(
+		director_name,
+		parent_directory_id,
+		userId,
+		userName
+		)
+		VALUES
+		(
+		#{directorName},
+		#{parentDirectoryId},
+		#{userId},
+		#{userName} )
+	</insert>
+	<!-- 修改目录 、移动目录 -->
+	<update id="updateDirectory" parameterType="com.bocom.domain.DirectoryWidget">
+		UPDATE t_directory_widget
+		<set>
+			<if test="directorName!=null and directorName!='' ">
+				director_name = #{directorName},
+			</if>
+			<!-- <if test="parentDirectoryId!=null"> -->
+				parent_directory_id = #{parentDirectoryId},
+			<!-- </if> -->
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<delete id="deleteDirecotry" parameterType="com.bocom.domain.DirectoryWidget">
+		delete from
+		t_directory_widget where id=#{id}
+	</delete>
+	<!-- 查找目录下的子目录 -->
+	<select id="selectSubDirectory" resultMap="DirectoryWidget"
+		parameterType="com.bocom.domain.DirectoryWidget">
+		SELECT
+		id,
+		director_name,
+		parent_directory_id,
+		userId,
+		userName
+		FROM
+		t_directory_widget
+		where 1=1
+		<if test="parentDirectoryId!=null ">
+			and parent_directory_id=#{parentDirectoryId}
+		</if>
+		<if test="userId!=null ">
+			and userId=#{userId}
+		</if>
+	</select>
+	<!-- 查找该目录 -->
+	<select id="selectDirectoryInfoById" resultMap="DirectoryWidget"
+		parameterType="com.bocom.domain.DirectoryWidget">
+		SELECT
+		id,
+		director_name,
+		parent_directory_id,
+		userId,
+		userName
+		FROM
+		t_directory_widget
+		where 1=1
+		<if test="id!=null ">
+			and id=#{id}
+		</if>
+	</select>
+	<!-- 查找某用户下的根目录 -->
+	<select id="selectDirectoryInfoByUser" resultMap="DirectoryWidget"
+		parameterType="com.bocom.domain.DirectoryWidget">
+		SELECT
+		id,
+		director_name,
+		parent_directory_id,
+		userId,
+		userName
+		FROM
+		t_directory_widget
+		where 1=1 and parent_directory_id is null
+		<if test="userId!=null ">
+			and userId=#{userId}
+		</if>
+		<if test="directorName!=null and directorName!=''">
+			and director_name=#{directorName}
+		</if>
+	</select>
+</mapper>

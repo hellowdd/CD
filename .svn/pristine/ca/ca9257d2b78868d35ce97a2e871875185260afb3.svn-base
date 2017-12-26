@@ -1,0 +1,120 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bocom.dao.WidgetExtendInfoDao">
+	<resultMap type="com.bocom.domain.WidgetExtendInfo" id="WidgetExtendInfo">
+
+		<result column="id" property="id" />
+		<result column="widget_id" property="widgetId" />
+		<result column="directory_id" property="directoryId" />
+		<result column="download_times" property="downloadTimes" />
+		<result column="is_share" property="isShare" />
+		<result column="share_range" property="shareRange" />
+		<result column="share_time" property="shareTime" />
+		<result column="share_widget_id" property="shareWidgetId" />
+		<result column="widget_type_id" property="widgetTypeId" />
+		<result column="app_type" property="appType" />
+
+	</resultMap>
+
+	<select id="selectAll" resultMap="WidgetExtendInfo"
+		parameterType="com.bocom.domain.WidgetExtendInfo">
+		SELECT
+		id,
+		widget_id,
+		directory_id,
+		download_times,is_share,
+		share_range,
+		share_time,
+		share_widget_id,widget_type_id,app_type
+		FROM t_widget_extend_info
+	</select>
+	<!-- 创建控件扩展数据记录 -->
+	<insert id="insert" parameterType="com.bocom.domain.WidgetExtendInfo">
+		INSERT INTO
+		t_widget_extend_info
+		(
+		widget_id,
+		directory_id,is_share,
+		share_range,
+		share_time,
+		share_widget_id,widget_type_id,app_type
+		)
+		VALUES
+		(
+		#{widgetId},
+		#{directoryId},#{isShare},
+		#{shareRange},
+		#{shareTime},
+		#{shareWidgetId},#{widgetTypeId},#{appType} )
+	</insert>
+	<!-- 获取控件扩展记录 -->
+	<select id="selectWidgetExtendInfo" resultMap="WidgetExtendInfo"
+		parameterType="com.bocom.domain.WidgetExtendInfo">
+		SELECT
+		id,
+		widget_id,
+		directory_id,
+		download_times,is_share,
+		share_range,
+		share_time,
+		share_widget_id,widget_type_id,app_type
+		FROM t_widget_extend_info
+		WHERE 1=1 
+		<if test="id!=null">
+			and id=#{id}
+		</if>
+		<if test="widgetId!=null">
+			and widget_id=#{widgetId}
+		</if>
+	</select>
+	<!-- 修改控件扩展记录 -->
+	<update id="updateWidgetExtendInfo" parameterType="com.bocom.domain.WidgetExtendInfo">
+		UPDATE t_widget_extend_info
+		<set>
+			<if test="directoryId!=null">
+				directory_id = #{directoryId},
+			</if>
+			<if test="downloadTimes!=null">
+				download_times = #{downloadTimes},
+			</if>
+			<if test="isShare!=null and isShare!='' ">
+				is_share = #{isShare},
+			</if>
+			<if test="shareRange!=null and shareRange!='' ">
+				share_range = #{shareRange},
+			</if>
+			<if test="shareTime!=null ">
+				share_time = #{shareTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="shareWidgetId!=null">
+				share_widget_id = #{shareWidgetId},
+			</if>
+			<if test="widgetTypeId!=null">
+				widget_type_id = #{widgetTypeId},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	<!-- 下载次数加1 -->
+	<update id="updateWidgetDownloadTimes" parameterType="com.bocom.domain.WidgetExtendInfo">
+		UPDATE t_widget_extend_info
+		set download_times=download_times+1
+		where widget_id = #{widgetId,jdbcType=INTEGER}
+	</update>
+	<!-- 发布次数加1 -->
+	<update id="updateWidgetReleaseTimes" parameterType="com.bocom.domain.WidgetExtendInfo">
+		UPDATE t_widget_extend_info
+		set release_times=release_times+1
+		where widget_id = #{widgetId,jdbcType=INTEGER}
+	</update>
+	<!-- 修改某人下的类型为固定类型 -->
+	<update id="updateWidgetType" parameterType="com.bocom.domain.WidgetExtendInfo">
+		update t_widget_extend_info twe,t_widget_info tw
+		SET twe.widget_type_id=4
+		 where twe.widget_id=tw.id 
+		 and twe.widget_type_id= #{widgetTypeId,jdbcType=INTEGER} 
+		 and tw.upload_userid= #{uploadUserid,jdbcType=INTEGER}
+	</update>
+</mapper>

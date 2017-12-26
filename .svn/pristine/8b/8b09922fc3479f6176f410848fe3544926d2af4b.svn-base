@@ -1,0 +1,304 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/css/sub.css" />
+		<style type="text/css">
+			.txt-red{
+				color: red;
+			}
+		</style>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.9.1.min.js" ></script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/bootstrap.min.js" ></script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/highchart/highcharts.js" ></script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/laypage-v1.3/laypage/laypage.js" ></script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/js/base.js" ></script>
+		<!--[if lt IE 9]>
+			<style type="text/css">
+				.layui-layer{
+					border: 1px solid #ccc;
+				}
+			</style>
+	      	<script src="${pageContext.request.contextPath}/js/html5shiv.min.js"></script>
+	      	<script src="${pageContext.request.contextPath}/js/respond.min.js"></script>
+		<![endif]-->
+	</head>
+	<body>
+		<div style="margin:20px;">
+			<!-- Nav tabs -->
+			<ul class="nav nav-tabs" role="tablist" id="tabSel">
+				<li role="presentation" class="active"><a href="#byCompany1" aria-controls="byCompany1" role="tab" data-toggle="tab">按企业提交控件总量</a></li>
+				<li role="presentation"><a href="#byCompany2" aria-controls="byCompany2" role="tab" data-toggle="tab">按企业提交控件使用次数</a></li>
+				<li role="presentation"><a href="#byUseNum" aria-controls="byUseNum" role="tab" data-toggle="tab">按各个控件使用次数</a></li>
+				<li role="presentation"><a href="#byType" aria-controls="byType" role="tab" data-toggle="tab">按类型</a></li>
+			</ul>
+			<!-- Tab panes -->
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane active" id="byCompany1">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>企业名称</th>
+								<th>上传控件数量</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+					<div style="float:right; height: 40px;" id="page_byCompany1"></div>
+				</div>
+				<div role="tabpanel" class="tab-pane" id="byCompany2">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>企业名称</th>
+								<th>控件使用次数</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+					<div style="float:right; height: 40px;" id="page_byCompany2"></div>
+				</div>
+				<div role="tabpanel" class="tab-pane" id="byUseNum">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>控件名称</th>
+								<th>控件使用次数</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+					<div style="float:right; height: 40px;" id="page_byUseNum"></div>
+				</div>
+				<div role="tabpanel" class="tab-pane" id="byType">
+					<div style="height: 400px; margin: 20px;" id="container"></div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var store = {};
+		var urlObj = {
+			byCompany1:"${pageContext.request.contextPath}/manager/widget/getWidgetNum",
+			byCompany2:"${pageContext.request.contextPath}/manager/widget/getWidgetAllReleaseNum",
+			byUseNum:"${pageContext.request.contextPath}/manager/widget/getWidgetReleaseNum"
+		};
+		var pageNumObj = {
+			byCompany1:1,
+			byCompany2:1,
+			byUseNum:1
+		}
+		$(document).on("ready",function(){
+			//获取数据
+		  query('byCompany1');
+		  
+		  $('#tabSel').find("a").click(function (e) {
+			  e.preventDefault();
+			  $(this).tab('show');
+			});
+			
+			$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+//			  e.target // newly activated tab
+//			  e.relatedTarget // previous active tab
+				var tabId = $(e.target).attr("href").substring(1,$(e.target).attr("href").length);
+				switch(tabId){
+					case "byCompany1":
+						query('byCompany1');
+						break;
+					case "byCompany2":
+						query('byCompany2');
+						break;
+					case "byUseNum":
+						query('byUseNum');
+						break;
+					case "byType":
+						createChart();
+						break;
+					default:
+						break;
+				}
+			})
+		  
+		  $("#byCompany1").on("click","a",function(e){
+				var a = $(e.currentTarget);
+				var companyId = a.attr("companyId");
+		  	window.parent.layer.open({
+					type: 2,
+				  title: '新增控件',
+				  shade: 0.3,
+				  area: ['720px', '480px'],
+					title: a.prev().html() + "的控件使用情况", //不显示标题
+					content: "${pageContext.request.contextPath}/manager/view/countByCompany#"+companyId,
+					success:function(layero, index){
+						window.parent.winList.push(index);
+						a.blur();
+					}
+				});
+		  });
+		  
+		});
+			
+		//查询控件列表
+		function query(id,companyId) {
+			var paramsObj = {
+				pageSize: 20,
+				pageNum:pageNumObj[id]
+			};
+			$.ajax({
+		    dataType: "json",
+		    //type: "POST",
+		    url: urlObj[id],
+				data:paramsObj,
+		    cache: false,
+		    success: function(res) {
+		      if(res.success){
+						store[id] = res.data;
+		      	createTable(id,res.data);
+		      	laypage({
+							cont: 'page_'+id, //容器。值支持id名、原生dom对象，jquery对象。【如该容器为】：<div id="page1"></div>
+							pages: Math.ceil(res.count/20), //通过后台拿到的总页数
+							curr: pageNumObj[id] || 1, //当前页
+							skin: '#428bca',
+							jump: function(obj, first) { //触发分页后的回调
+								if(!first) { //点击跳页触发函数自身，并传递当前页：obj.curr
+									pageNumObj[id] = obj.curr;
+									query(id);
+								}
+							}
+						});
+		      }else{
+		      	window.parent.layer.alert("获取统计列表失败！"+res.message);
+		      }
+		    },
+				error: function(jqXHR,textStatus,errorThrown) {
+					if(jqXHR.readyState == 0 && jqXHR.responseText == "" && XHR.status == 0 && jqXHR.statusText == "error"){
+						
+					}else{
+						window.parent.layer.alert("获取统计列表失败！");
+					}
+        }
+		  });
+		}
+			
+		function createTable(id,data){
+			var str = '';
+			switch(id){
+				case "byCompany1":
+					for(var i=0;i<data.length;i++){
+						str += '<tr>' +
+									 '	<td><span>'+data[i].upload_username+'</span>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" companyId="'+data[i].upload_userid+'">查看该企业控件使用情况</a></td>' +
+									 '	<td>'+data[i].count+'</td>' +
+									 '</tr>';
+					}
+					break;
+				case "byCompany2":
+					for(var i=0;i<data.length;i++){
+						str += '<tr>' +
+									 '	<td><span>'+data[i].upload_username+'</span></td>' +
+									 '	<td>'+data[i].release_times+'</td>' +
+									 '</tr>';
+					}
+					break;
+				case "byUseNum":
+					for(var i=0;i<data.length;i++){
+						str += '<tr>' +
+									 '	<td>'+data[i].widget_name_show+'</td>' +
+									 '	<td>'+data[i].release_times+'</td>' +
+									 '</tr>';
+					}
+					break;
+				default:
+					break;
+			}
+			$("#"+id).find("tbody").eq(0).html(str);
+		}
+		
+		function createChart(){
+			$.ajax({
+        dataType: "json",
+        //type: "POST",
+        url: "${pageContext.request.contextPath}/manager/widget/getWidgetNumByType",
+        cache: false,
+        success: function(res) {
+        	if(res.success){
+        		result = res.data;
+        		console.log(result);
+        		var list = [];
+        		var count = 0;
+        		for(var i=0;i<res.data.length;i++){
+        			if(res.data[i].id<5){
+        				list.push([res.data[i].widget_type_name,res.data[i].count]);
+        			}else{
+        				count += res.data[i].count;
+        			}
+        		}
+        		list.push(["自定义控件类型",count]);
+            var use = res.data.spaceUseByte;
+            var nouse = res.data.spaceRestByte;
+            
+            $('#container').highcharts({
+              chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false
+              },
+              title: {
+                text: '控件类型统计'
+              },
+              plotOptions: {
+                pie: {
+                  cursor: 'pointer',
+                  dataLabels: {
+                    enabled: true,
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                    style: {
+                      color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                    }
+                  }
+                }
+              },
+              colors:[
+                "#006699",
+                "#468C00"
+              ],
+              credits: {
+         	      enabled: false
+            	},
+              series: [{
+                type: 'pie',
+                name: '控件类型统计',
+                data: list
+              }],
+              tooltip : {
+      			    formatter : function() {
+      			    	console.log(this.point)
+      		        return "<b>控件类型统计:</b><br />" + this.point.name+":"+this.y;
+      			    }
+      				}
+          	});
+        	}else{
+        		window.parent.layer.alert('获取信息失败！');
+        	}
+        },
+        error: function() {
+          window.parent.layer.alert('获取信息失败！');
+        }
+      });
+		}
+		
+		function filterBlank(str){
+			if(str){
+				if(str == "undefined"){
+					return "";
+				}else{
+					return str;
+				}
+			}else{
+				return "";
+			}
+		}
+	</script>
+</html>

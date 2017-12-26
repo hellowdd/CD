@@ -1,0 +1,92 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bocom.dao.SpaceManageDao">
+    <resultMap type="com.bocom.domain.SpaceManage" id="spaceManage">
+
+        <result column="id" property="id"/>
+        <result column="user_type" property="userType"/>
+        <result column="user_id" property="userId"/>
+        <result column="space_total" property="spaceTotal"/>
+        <result column="space_use" property="spaceUse"/>
+        <result column="space_rest" property="spaceRest"/>
+
+    </resultMap>
+
+    <select id="selectAll" resultMap="spaceManage" parameterType="com.bocom.domain.SpaceManage">
+		SELECT
+		id,
+		user_type,
+		user_id,
+		space_total,
+		space_use,
+		space_rest
+		FROM t_space_manage
+	</select>
+
+    <insert id="insert" parameterType="com.bocom.domain.SpaceManage">
+		INSERT INTO t_space_manage
+		(
+		user_type,
+		user_id,
+		space_total,
+		space_use,
+		space_rest
+		)
+		VALUES
+		(
+		#{userType},
+		#{userId},
+		#{spaceTotal},
+		#{spaceUse},
+		#{spaceRest} )
+	</insert>
+    <select id="selectSpaceMangeInfo" resultMap="spaceManage"
+            parameterType="com.bocom.domain.SpaceManage">
+        SELECT
+        id,
+        user_type,
+        user_id,
+        space_total,
+        space_use,
+        space_rest
+        FROM t_space_manage
+        WHERE 1=1
+        <if test="userType!=null and userType!=''">
+            and user_type = #{userType}
+        </if>
+        <if test="userId!=null">
+            and user_id = #{userId}
+        </if>
+    </select>
+    <!-- 更新空间使用情况等 -->
+    <update id="updateSpaceManage" parameterType="com.bocom.domain.SpaceManage">
+        update t_space_manage
+        <set>
+            <if test="spaceTotal != null">
+                space_total = #{spaceTotal},
+            </if>
+            <if test="spaceUse != null and spaceUse !=''">
+                space_use = #{spaceUse},
+            </if>
+            <if test="spaceRest != null">
+                space_rest = #{spaceRest},
+            </if>
+        </set>
+        where 1=1 and id=#{id}
+    </update>
+
+    <!--查询用户占用空间大于的用户总量-->
+    <select id="selectUserCount" resultType="java.lang.Integer"
+            parameterType="Map">
+        SELECT count(*)  t_space_manage
+        WHERE 1=1
+        <![CDATA[
+        <if test="space!=null and space!=''">
+            and space_use/space_total > #{space}
+        </if>
+        ]]>
+
+    </select>
+</mapper>
